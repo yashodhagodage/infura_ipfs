@@ -1,21 +1,26 @@
-const ipfsClient = require('ipfs-http-client');
-
 const projectId = process.env.INFURA_IPFS_PROJECT_ID
 const projectSecret = process.env.INFURA_IPFS_PROJECT_SECRET
-// const projectIdAndSecret = `${projectId}:${projectSecret}`
+const projectIdAndSecret = `${projectId}:${projectSecret}`
 
-const auth =
-    'Basic ' + Buffer.from(projectId + ':' + projectSecret).toString('base64');
+async function ipfsClient() {
+    const { create } = await import('ipfs-http-client')
+    const ipfs = await create(
+        {
+            host: "ipfs.infura.io",
+            port: 5001,
+            protocol: "https",
+            headers: {
+                "Authorization": `Basic ${Buffer.from(projectIdAndSecret).toString("base64")}`
+        }
+    });
+    return ipfs;
+}
 
-const client = await ipfsClient.create({
-    host: 'ipfs.infura.io',
-    port: 5001,
-    protocol: 'https',
-    headers: {
-        authorization: auth,
-    },
-});
+async function saveText() {
+    let ipfs = await ipfsClient();
 
-client.pin.add('QmeGAVddnBSnKc1DLE7DLV9uuTqo5F7QbaveTjr45JUdQn').then((res) => {
-    console.log(res);
-});
+    let result = await ipfs.add(`welcome ${new Date()}`);
+    console.log(result);
+}
+
+saveText();

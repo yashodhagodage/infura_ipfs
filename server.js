@@ -23,4 +23,18 @@ async function saveText() {
     console.log(result);
 }
 
-saveText();
+//saveText();
+
+async function getData(hash) {
+    let ipfs = await ipfsClient();
+
+    let asyncitr = ipfs.cat(hash)
+
+    for await (const itr of asyncitr) {
+
+        let data = Buffer.from(itr).toString()
+        console.log(data)
+    }
+}
+
+getData("QmUNLLsPACCz1vLxQVkXqqLX5R1X345qqfHbsf67hvA3Nn")
